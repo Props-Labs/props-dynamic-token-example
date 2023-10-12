@@ -1,5 +1,5 @@
 # Dynamic Token Example (HTML)
-A base starter theme to create your Dynamic Token with Props Gratis
+A base starter theme to create your Dynamic Token with [Props Gratis](https://prime.props.app)
 
 ## Usage
 Download `index.html` to get started
