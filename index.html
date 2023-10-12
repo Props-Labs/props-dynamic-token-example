@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Animation</title>
+    <style>
+        body,
+        html {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    
+        #container {
+            width: 80vmin;
+            /* 80% of the viewport's smaller dimension */
+            height: 80vmin;
+            background-color: #f0f0f0;
+            position: relative;
+        }
+    
+        canvas {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <canvas id="animationCanvas"></canvas>
+    </div>
+    <script>
+        // Parse the URL's query parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const metadataParam = urlParams.get('metadata');
+        let metadata = null;
+        try {
+            metadata = JSON.parse(metadataParam);
+        } catch(e) {
+            console.error("Error parsing metadata", e);
+        }
+        
+        // Retrieve the token_id parameter
+        const token_id = metadata?.token_id;
+        
+        // Canvas setup
+        const canvas = document.getElementById('animationCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = document.getElementById('container').clientWidth;
+        canvas.height = document.getElementById('container').clientHeight;
+        
+        // Your Animation - you can do everything here.
+        function drawPattern() {
+                // Drawing a pattern depending on token_id
+                const colors = ['#e63946', '#f1fa8c', '#a8dadc', '#457b9d', '#1d3557'];
+                ctx.strokeStyle = colors[token_id % colors.length];
+                const lineSpace = 10 + (token_id % 10);
+
+                for (let i = 0; i < canvas.width; i += lineSpace) {
+                    ctx.beginPath();
+                    ctx.moveTo(i, 0);
+                    ctx.lineTo(i, canvas.height);
+                    ctx.stroke();
+                }
+
+                for (let j = 0; j < canvas.height; j += lineSpace) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, j);
+                    ctx.lineTo(canvas.width, j);
+                    ctx.stroke();
+                }
+
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                const radius = 50 + (token_id % 150);
+                const gradient = ctx.createRadialGradient(centerX, centerY, 5, centerX, centerY, radius);
+                gradient.addColorStop(0, colors[(token_id + 1) % colors.length]);
+                gradient.addColorStop(1, colors[(token_id + 2) % colors.length]);
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, 0, Math.PI * 2, false);
+                ctx.fillStyle = gradient;
+                ctx.fill();
+            }
+
+            function animate() {
+                requestAnimationFrame(animate);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawPattern();
+            }
+
+            if (token_id !== null && token_id !== undefined) {
+                animate();
+            } else {
+                console.error("token_id is not available");
+            }
+    </script>
+</body>
+</html>
